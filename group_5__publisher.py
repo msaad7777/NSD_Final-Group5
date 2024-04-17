@@ -6,7 +6,6 @@ import group_5_data_generator
 import time
 import random
 import threading
-
 PORT = 1883
 
 class PublisherGUI:
