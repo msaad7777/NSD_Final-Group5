@@ -1,5 +1,4 @@
 import paho.mqtt.client as mqtt
-import group_5_util
 import json
 
 PORT = 1883
@@ -10,7 +9,7 @@ def on_message(client, userdata, message):
         decoded_message = message.payload.decode('utf-8')
         data_dict = json.loads(decoded_message)
         print(f"Received message from {topic}:")
-        group_5_util.print_data(data_dict)
+        print(data_dict)  # For demonstration, adjust handling as needed
     except Exception as e:
         print(f"Error handling message: {e}")
 
