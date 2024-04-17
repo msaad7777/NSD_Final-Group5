@@ -9,7 +9,11 @@ class PatternedDataGenerator:
         self.base_max = base_max
         self.fluctuation = fluctuation
         self.packet_id = 0  # Initialize packet ID
-
+    def set_parameters(self, base_min, base_max, fluctuation):
+        """Set the parameters for data generation."""
+        self.base_min = base_min
+        self.base_max = base_max
+        self.fluctuation = fluctuation
     def generate_value(self):
         """Generate a random value following a specified pattern."""
         base_value = random.uniform(self.base_min, self.base_max)

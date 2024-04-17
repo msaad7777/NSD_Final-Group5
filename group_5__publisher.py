@@ -5,6 +5,7 @@ from tkinter import messagebox
 import group_5_data_generator
 import time
 import random
+import threading
 
 PORT = 1883
 
@@ -65,7 +66,7 @@ class PublisherGUI:
         # Topic Label and Textbox
         self.topic_label = tk.Label(master, text="Topic:")
         self.topic_label.grid(row=7, column=0, padx=5, pady=5)
-        self.topic_entry = tk.Entry(master, state="disabled", disabledbackground="lightgray")
+        self.topic_entry = tk.Entry(master)  # Remove state="disabled"
         self.topic_entry.grid(row=7, column=1, padx=5, pady=5)
         self.topic_entry.insert(0, "Humidity Over Time")
 
@@ -118,22 +119,25 @@ class PublisherGUI:
 
     def start_publishing(self):
         self.client.loop_start()
-        self.publish_data()
+        # Start publishing data in a separate thread
+        self.publishing = True  # Set flag to indicate publishing
+        self.publish_thread = threading.Thread(target=self.publish_data_thread)
+        self.publish_thread.daemon = True
+        self.publish_thread.start()
         self.start_publishing_button.config(state="disabled")
         self.stop_publishing_button.config(state="normal")
-
     def stop_publishing(self):
-        self.client.loop_stop()
+        self.publishing = False
         self.start_publishing_button.config(state="normal")
         self.stop_publishing_button.config(state="disabled")
 
-    def publish_data(self):
+    def publish_data_thread(self):
         try:
             topic = self.topic_entry.get()
             if not topic:
                 raise ValueError("Topic cannot be empty")
 
-            while True:
+            while self.publishing:  # Check flag to continue publishing
                 data_value = self.data_generator.generate_value()
                 timestamp = time.time()
                 packet_id = random.randint(1, 1000000)
@@ -155,10 +159,9 @@ class PublisherGUI:
                 print(f"Published: {string}")
                 time.sleep(1)  # Adjust sleep time as needed
 
-            messagebox.showinfo("Success", "Data published successfully!")
+            # messagebox.showinfo("Success", "Data published successfully!")  # Avoid using messagebox in a thread
         except Exception as e:
             messagebox.showerror("Error", str(e))
-
 def main():
     root = tk.Tk()
     gui = PublisherGUI(root)
